@@ -82,7 +82,7 @@ const Home: NextPage = () => {
 
       <Header />
       <main className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 sm:mt-20 sm:mb-10 mt-10 mb-5">
-        <h1 className="mx-auto max-w-4xl font-display text-3xl font-bold tracking-normal text-slate-900 sm:text-7xl mb-7 sm:mb-10">
+        <h1 className="mx-auto max-w-4xl font-display text-3xl font-bold tracking-normal text-slate-900 sm:text-7xl mb-7 sm:mb-20">
           Translating all photos{" "}
           <span className="relative whitespace-nowrap text-[#3290EE]">
             <SquigglyLines />
@@ -113,7 +113,7 @@ const Home: NextPage = () => {
                     <Image
                       alt="photo"
                       src={photo}
-                      className="rounded-2xl relative shadow-lg"
+                      className="rounded-2xl max-w-[300px] sm:max-w-[500px] shadow-lg"
                       width={500}
                       height={500}
                     />

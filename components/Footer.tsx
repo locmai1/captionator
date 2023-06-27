@@ -4,15 +4,6 @@ export default function Footer() {
       <div>
         Powered by{" "}
         <a
-          href="https://nextjs.org/"
-          target="_blank"
-          rel="noreferrer"
-          className="font-bold hover:underline transition underline-offset-2"
-        >
-          Next.js
-        </a>
-        ,{" "}
-        <a
           href="https://vercel.com/"
           target="_blank"
           rel="noreferrer"
