@@ -65,10 +65,11 @@ const Home: NextPage = () => {
     });
 
     const response = await res.json();
+    console.log(response);
     if (res.status !== 200) {
-      setError(response);
+      setError(response.error);
     } else {
-      setCaption(response);
+      setCaption(response.caption);
     }
     setLoading(false);
   }

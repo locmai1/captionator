@@ -1,7 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { HfInference } from "@huggingface/inference";
 
-type Data = string;
+type Data = {
+  description?: string;
+  caption?: string;
+  error?: string | null;
+  usage?: Number;
+};
 interface ExtendedNextApiRequest extends NextApiRequest {
   body: {
     imageUrl: string;
@@ -16,11 +21,54 @@ export default async function handler(
   const blob = await imageUrl.blob();
 
   const inference = new HfInference(process.env.HF_ACCESS_TOKEN);
-  const response = await inference.imageToText({
+  const descriptionResponse = await inference.imageToText({
     data: blob,
     model: "Salesforce/blip-image-captioning-large",
   });
-  const data = response.generated_text;
+  const description = descriptionResponse.generated_text;
 
-  res.status(200).json(data ? data : "Failed to caption photo");
+  if (!description) {
+    res.status(500).json({
+      error: "Failed to generate description",
+    });
+    return;
+  }
+
+  const captionResponse = await fetch(
+    "https://api.openai.com/v1/chat/completions",
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      method: "POST",
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "user",
+            content: `short ig caption: ${description}`,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 30,
+      }),
+    }
+  );
+  const captionData = await captionResponse.json();
+  const caption = captionData.choices[0].message.content.replace(/"/g, "");
+  const usage = captionData.usage.total_tokens;
+
+  if (!caption) {
+    res.status(500).json({
+      error: "Failed to generate caption",
+    });
+    return;
+  }
+
+  res.status(200).json({
+    description: description,
+    caption: caption,
+    usage: usage,
+  });
 }
