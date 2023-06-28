@@ -56,10 +56,8 @@ export default async function handler(
     }
   );
   const captionData = await captionResponse.json();
-  const caption = captionData.choices[0].message.content.replace(/"/g, "");
-  const usage = captionData.usage.total_tokens;
 
-  if (!caption) {
+  if (captionData.error) {
     res.status(500).json({
       error: "Failed to generate caption",
     });
@@ -68,7 +66,7 @@ export default async function handler(
 
   res.status(200).json({
     description: description,
-    caption: caption,
-    usage: usage,
+    caption: captionData.choices[0].message.content.replace(/"/g, ""),
+    usage: captionData.usage.total_tokens,
   });
 }
