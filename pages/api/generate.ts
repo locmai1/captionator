@@ -4,7 +4,7 @@ import { HfInference } from "@huggingface/inference";
 type Data = {
   description?: string;
   caption?: string;
-  error?: string | null;
+  error?: string;
   usage?: Number;
 };
 interface ExtendedNextApiRequest extends NextApiRequest {
