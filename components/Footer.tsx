@@ -4,15 +4,6 @@ export default function Footer() {
       <div>
         Powered by{" "}
         <a
-          href="https://vercel.com/"
-          target="_blank"
-          rel="noreferrer"
-          className="font-bold hover:underline transition underline-offset-2"
-        >
-          Vercel
-        </a>
-        ,{" "}
-        <a
           href="https://upload.io/"
           target="_blank"
           rel="noreferrer"
@@ -20,7 +11,7 @@ export default function Footer() {
         >
           Upload
         </a>
-        , &{" "}
+        ,{" "}
         <a
           href="https://huggingface.co/"
           target="_blank"
@@ -28,6 +19,15 @@ export default function Footer() {
           className="font-bold hover:underline transition underline-offset-2"
         >
           Hugging Face
+        </a>
+        , &{" "}
+        <a
+          href="https://openai.com/blog/openai-api"
+          target="_blank"
+          rel="noreferrer"
+          className="font-bold hover:underline transition underline-offset-2"
+        >
+          OpenAI
         </a>
         .
       </div>
