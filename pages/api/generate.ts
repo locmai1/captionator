@@ -4,8 +4,9 @@ import { HfInference } from "@huggingface/inference";
 type Data = {
   description?: string;
   caption?: string;
-  error?: string;
   usage?: Number;
+  error?: string;
+  type: string;
 };
 interface ExtendedNextApiRequest extends NextApiRequest {
   body: {
@@ -30,6 +31,7 @@ export default async function handler(
   if (!description) {
     res.status(500).json({
       error: "Failed to generate description",
+      type: "unknown",
     });
     return;
   }
@@ -60,6 +62,7 @@ export default async function handler(
   if (captionData.error) {
     res.status(500).json({
       error: "Failed to generate caption",
+      type: captionData.error.type,
     });
     return;
   }
@@ -68,5 +71,6 @@ export default async function handler(
     description: description,
     caption: captionData.choices[0].message.content.replace(/"/g, ""),
     usage: captionData.usage.total_tokens,
+    type: "success",
   });
 }
