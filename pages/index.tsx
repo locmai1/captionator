@@ -9,7 +9,6 @@ import Footer from "../components/Footer";
 import Header from "../components/Header";
 import LoadingDots from "../components/LoadingDots";
 import ResizablePanel from "../components/ResizablePanel";
-import SquigglyLines from "../components/SquigglyLines";
 import copyToClipboard from "../utils/copyToClipboard";
 
 // Configuration for the uploader
@@ -85,9 +84,8 @@ const Home: NextPage = () => {
       <main className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 sm:mt-20 sm:mb-10 mt-10 mb-5">
         <h1 className="mx-auto max-w-4xl font-display text-3xl font-bold tracking-normal text-slate-900 sm:text-7xl mb-7 sm:mb-20">
           Translating all photos{" "}
-          <span className="relative whitespace-nowrap text-[#3290EE]">
-            <SquigglyLines />
-            <span className="relative">using AI</span>
+          <span className="relative whitespace-nowrap text-transparent bg-clip-text bg-gradient-to-r from-[#E1306C] to-[#833AB4]">
+            using AI
           </span>{" "}
           into captions.
         </h1>
