@@ -114,11 +114,13 @@ const Home: NextPage = () => {
               ) : status === "authenticated" && !photo && !reset ? (
                 <UploadDropZone />
               ) : (
-                <Button
-                  text="Sign in with Google"
-                  icon={<GoogleIcon />}
-                  onClick={() => signIn("google")}
-                />
+                !photo && (
+                  <Button
+                    text="Sign in with Google"
+                    icon={<GoogleIcon />}
+                    onClick={() => signIn("google")}
+                  />
+                )
               )}
               {caption && photo && (
                 <div className="flex flex-col h-full">

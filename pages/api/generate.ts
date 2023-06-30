@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { HfInference } from "@huggingface/inference";
 import { Ratelimit } from "@upstash/ratelimit";
-import requestIp from "request-ip";
+import { getServerSession } from "next-auth";
+import { authOptions } from "./auth/[...nextauth]";
 import redis from "../../utils/redis";
 
 type Data = {
@@ -29,8 +30,18 @@ export default async function handler(
   req: ExtendedNextApiRequest,
   res: NextApiResponse<Data>
 ) {
+  // Check if user is logged in
+  const session = await getServerSession(req, res, authOptions);
+  if (!session || !session.user) {
+    res.status(500).json({
+      error: "Unauthenticated request",
+      type: "unauthorized_access",
+    });
+    return;
+  }
+
   if (ratelimit) {
-    const identifier = requestIp.getClientIp(req);
+    const identifier = session.user.email;
     const result = await ratelimit.limit(identifier!);
     const reset = new Date(result.reset).toLocaleString();
 
