@@ -10,6 +10,7 @@ import Header from "../components/Header";
 import LoadingDots from "../components/LoadingDots";
 import ResizablePanel from "../components/ResizablePanel";
 import copyToClipboard from "../utils/copyToClipboard";
+import { useSession, signIn } from "next-auth/react";
 
 // Configuration for the uploader
 const uploader = Uploader({ apiKey: "free" });
@@ -38,6 +39,7 @@ const Home: NextPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [reset, setReset] = useState<string | null>(null);
+  const { data: session, status } = useSession();
 
   const UploadDropZone = () => (
     <UploadDropzone
@@ -78,7 +80,7 @@ const Home: NextPage = () => {
   }
 
   return (
-    <div className="flex max-w-6xl mx-auto flex-col items-center justify-center py-2 min-h-screen">
+    <div className="flex max-w-6xl mx-auto flex-col items-center justify-center py-2 min-h-screen bg-[#f5f5f5]">
       <Head>
         <title>captionator</title>
         <link rel="icon" href="/favicon.ico" />
@@ -96,7 +98,42 @@ const Home: NextPage = () => {
         <ResizablePanel>
           <AnimatePresence mode="wait">
             <motion.div className="flex justify-between items-center w-full flex-col">
-              {!photo && !reset && <UploadDropZone />}
+              {/* {!photo && !reset && <UploadDropZone />} */}
+              {status === "loading" ? (
+                <button
+                  disabled
+                  className="bg-black rounded-full text-white font-medium px-4 pt-2 pb-3 hover:bg-black/80 w-40 my-2"
+                >
+                  <span className="pt-4">
+                    <LoadingDots color="white" />
+                  </span>
+                </button>
+              ) : status === "authenticated" && !photo && !reset ? (
+                <UploadDropZone />
+              ) : (
+                <button
+                  type="button"
+                  className="my-2 py-3 px-6 inline-flex justify-center items-center gap-2 rounded-md border-2 border-black/80 font-semibold text-black hover:text-white hover:bg-black/80 hover:border-gray-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-all text-md"
+                  onClick={() => signIn("google")}
+                >
+                  <svg
+                    className="w-4 h-4"
+                    aria-hidden="true"
+                    focusable="false"
+                    data-prefix="fab"
+                    data-icon="google"
+                    role="img"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 488 512"
+                  >
+                    <path
+                      fill="currentColor"
+                      d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"
+                    ></path>
+                  </svg>
+                  Sign in with Google
+                </button>
+              )}
               {caption && photo && (
                 <div className="flex flex-col h-full">
                   <div>
