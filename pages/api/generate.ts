@@ -23,6 +23,7 @@ const ratelimit = redis
   ? new Ratelimit({
       redis: redis,
       limiter: Ratelimit.fixedWindow(3, "1440 m"),
+      analytics: true,
     })
   : undefined;
 
