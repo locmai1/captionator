@@ -37,6 +37,7 @@ const Home: NextPage = () => {
   const [caption, setCaption] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [reset, setReset] = useState<string | null>(null);
 
   const UploadDropZone = () => (
     <UploadDropzone
@@ -64,13 +65,16 @@ const Home: NextPage = () => {
     });
 
     const response = await res.json();
-    console.log(response);
     if (res.status !== 200) {
+      if (response.reset) {
+        setReset(response.reset);
+      }
       setError(response.error);
     } else {
       setCaption(response.caption);
     }
     setLoading(false);
+    console.log(response);
   }
 
   return (
@@ -92,7 +96,7 @@ const Home: NextPage = () => {
         <ResizablePanel>
           <AnimatePresence mode="wait">
             <motion.div className="flex justify-between items-center w-full flex-col">
-              {!photo && <UploadDropZone />}
+              {!photo && !reset && <UploadDropZone />}
               {caption && photo && (
                 <div className="flex flex-col h-full">
                   <div>
@@ -143,7 +147,7 @@ const Home: NextPage = () => {
                   </button>
                 )}
               </div>
-              {error && (
+              {error && !reset && (
                 <div>
                   <div
                     className="mx-auto w-64 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
@@ -164,6 +168,20 @@ const Home: NextPage = () => {
                       here
                     </button>{" "}
                     to retry
+                  </p>
+                </div>
+              )}
+              {reset && (
+                <div>
+                  <div
+                    className="mx-auto w-64 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+                    role="alert"
+                  >
+                    <span className="block sm:inline">{error}</span>
+                  </div>
+                  <p className="mx-auto sm:w-96 text-slate-500 leading-7 mt-1">
+                    Requests will reset @{" "}
+                    <span className="font-bold">{reset}</span>.
                   </p>
                 </div>
               )}

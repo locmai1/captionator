@@ -1,10 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { HfInference } from "@huggingface/inference";
+import { Ratelimit } from "@upstash/ratelimit";
+import requestIp from "request-ip";
+import redis from "../../utils/redis";
 
 type Data = {
   description?: string;
   caption?: string;
   usage?: Number;
+  reset?: string;
   error?: string;
   type: string;
 };
@@ -13,11 +17,33 @@ interface ExtendedNextApiRequest extends NextApiRequest {
     imageUrl: string;
   };
 }
+// Rate limiter: 3 requests per day
+const ratelimit = redis
+  ? new Ratelimit({
+      redis: redis,
+      limiter: Ratelimit.fixedWindow(3, "1440 m"),
+    })
+  : undefined;
 
 export default async function handler(
   req: ExtendedNextApiRequest,
   res: NextApiResponse<Data>
 ) {
+  if (ratelimit) {
+    const identifier = requestIp.getClientIp(req);
+    const result = await ratelimit.limit(identifier!);
+    const reset = new Date(result.reset).toLocaleString();
+
+    if (!result.success) {
+      res.status(429).json({
+        error: "Too many requests",
+        reset: reset,
+        type: "rate_limit",
+      });
+      return;
+    }
+  }
+
   const imageUrl = await fetch(req.body.imageUrl);
   const blob = await imageUrl.blob();
 
