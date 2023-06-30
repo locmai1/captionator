@@ -15,7 +15,9 @@ import copyToClipboard from "../utils/copyToClipboard";
 import { useSession, signIn } from "next-auth/react";
 
 // Configuration for the uploader
-const uploader = Uploader({ apiKey: "free" });
+const uploader = Uploader({
+  apiKey: process.env.UPLOADER_API_KEY ? process.env.UPLOADER_API_KEY : "free",
+});
 const options = {
   maxFileCount: 1,
   mimeTypes: ["image/jpeg", "image/png", "image/jpg"],
