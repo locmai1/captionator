@@ -9,7 +9,6 @@ type Data = {
   description?: string;
   caption?: string;
   usage?: Number;
-  reset?: string;
   error?: string;
   type: string;
 };
@@ -22,7 +21,7 @@ interface ExtendedNextApiRequest extends NextApiRequest {
 const ratelimit = redis
   ? new Ratelimit({
       redis: redis,
-      limiter: Ratelimit.fixedWindow(3, "1440 m"),
+      limiter: Ratelimit.fixedWindow(5, "1440 m"),
       analytics: true,
     })
   : undefined;
@@ -44,12 +43,10 @@ export default async function handler(
   if (ratelimit) {
     const identifier = session.user.email;
     const result = await ratelimit.limit(identifier!);
-    const reset = new Date(result.reset).toLocaleString();
 
     if (!result.success) {
       res.status(429).json({
         error: "Too many requests",
-        reset: reset,
         type: "rate_limit",
       });
       return;
