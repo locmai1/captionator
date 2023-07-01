@@ -110,4 +110,5 @@ export default async function handler(
     usage: captionData.usage.total_tokens,
     type: "success",
   });
+  return;
 }

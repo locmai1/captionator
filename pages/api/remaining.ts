@@ -41,4 +41,5 @@ export default async function handler(
     reset: reset.toLocaleString(),
     type: "success",
   });
+  return;
 }
