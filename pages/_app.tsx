@@ -8,7 +8,9 @@ export default function App({
 }: AppProps) {
   return (
     <SessionProvider session={session}>
-      <Component {...pageProps} />
+      <div className="bg-[#f5f5f5]">
+        <Component {...pageProps} />
+      </div>
     </SessionProvider>
   );
 }
