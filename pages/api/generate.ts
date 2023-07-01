@@ -17,11 +17,13 @@ interface ExtendedNextApiRequest extends NextApiRequest {
     imageUrl: string;
   };
 }
-// Rate limiter: 3 requests per day
+// Rate limiter: 5 requests per day
+const env = parseInt(process.env.UPSTASH_REDIS_RATE_LIMIT || "");
+const limit = Number.isInteger(env) ? env : 0;
 const ratelimit = redis
   ? new Ratelimit({
       redis: redis,
-      limiter: Ratelimit.fixedWindow(5, "1440 m"),
+      limiter: Ratelimit.fixedWindow(limit, "1440 m"),
       analytics: true,
     })
   : undefined;
