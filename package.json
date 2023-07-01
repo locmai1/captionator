@@ -1,4 +1,6 @@
 {
+  "name": "captionator",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -11,13 +13,11 @@
     "@prisma/client": "^4.16.1",
     "@upstash/ratelimit": "^0.4.3",
     "@upstash/redis": "^1.22.0",
-    "framer-motion": "^8.2.4",
     "next": "latest",
     "next-auth": "^4.22.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-uploader": "^3.0.2",
-    "react-use-measure": "^2.1.1",
     "swr": "^2.2.0",
     "uploader": "^3.0.2"
   },
@@ -25,7 +25,6 @@
     "@types/node": "18.11.3",
     "@types/react": "18.0.21",
     "@types/react-dom": "18.0.6",
-    "@types/request-ip": "^0.0.38",
     "autoprefixer": "^10.4.12",
     "postcss": "^8.4.18",
     "prisma": "^4.16.1",
