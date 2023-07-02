@@ -2,21 +2,10 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { HfInference } from "@huggingface/inference";
 import { Ratelimit } from "@upstash/ratelimit";
 import { getServerSession } from "next-auth";
+import { Response, ExtendedNextApiRequest } from "../../types/server";
 import { authOptions } from "./auth/[...nextauth]";
 import redis from "../../utils/redis";
 
-type Data = {
-  description?: string;
-  caption?: string;
-  usage?: Number;
-  error?: string;
-  type: string;
-};
-interface ExtendedNextApiRequest extends NextApiRequest {
-  body: {
-    imageUrl: string;
-  };
-}
 // Rate limiter: 5 requests per day
 const env = parseInt(process.env.UPSTASH_REDIS_RATE_LIMIT || "");
 const limit = Number.isInteger(env) ? env : 0;
@@ -30,7 +19,7 @@ const ratelimit = redis
 
 export default async function handler(
   req: ExtendedNextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<Response>
 ) {
   // Check if user is logged in
   const session = await getServerSession(req, res, authOptions);

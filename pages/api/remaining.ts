@@ -1,18 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
+import { Response } from "../../types/server";
 import { authOptions } from "./auth/[...nextauth]";
 import redis from "../../utils/redis";
 
-type Data = {
-  error?: string;
-  remaining?: number;
-  reset?: string;
-  type: string;
-};
-
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<Response>
 ) {
   // Check if user is logged in
   const session = await getServerSession(req, res, authOptions);
