@@ -1,8 +1,9 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiResponse } from "next";
 import { HfInference } from "@huggingface/inference";
 import { Ratelimit } from "@upstash/ratelimit";
 import { getServerSession } from "next-auth";
 import { Response, ExtendedNextApiRequest } from "../../types/server";
+import { OpenAIChatMessage } from "../../types/OpenAI";
 import { authOptions } from "./auth/[...nextauth]";
 import redis from "../../utils/redis";
 
@@ -62,6 +63,20 @@ export default async function handler(
     return;
   }
 
+  const context: OpenAIChatMessage[] = [
+    {
+      role: "user",
+      content: `short ig caption: ${description}`,
+    },
+  ];
+
+  // TODO: put the description into a context Message(role, content)
+  // TODO: get caption, append into context variable
+  // TODO: figure out how to handle context variable elegantly
+  // TODO: set context as a response field, set field on frontend
+  // TODO: build api/refresh route that takes in context as params
+  // TODO: api/refresh response will generate new caption, append it to params, return params
+
   const captionResponse = await fetch(
     "https://api.openai.com/v1/chat/completions",
     {
@@ -72,12 +87,7 @@ export default async function handler(
       method: "POST",
       body: JSON.stringify({
         model: "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "user",
-            content: `short ig caption: ${description}`,
-          },
-        ],
+        messages: context,
         temperature: 0.7,
         max_tokens: 30,
       }),
@@ -93,9 +103,15 @@ export default async function handler(
     return;
   }
 
+  const caption = captionData.choices[0].message.content.replace(/"/g, "");
+  context.push({
+    role: "assistant",
+    content: caption,
+  });
+
   res.status(200).json({
-    description: description,
-    caption: captionData.choices[0].message.content.replace(/"/g, ""),
+    context: context,
+    caption: caption,
     usage: captionData.usage.total_tokens,
     type: "success",
   });

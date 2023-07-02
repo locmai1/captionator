@@ -1,4 +1,5 @@
 import { NextApiRequest } from "next";
+import { OpenAIChatMessage } from "./OpenAI";
 
 export interface ExtendedNextApiRequest extends NextApiRequest {
   body: {
@@ -7,7 +8,7 @@ export interface ExtendedNextApiRequest extends NextApiRequest {
 }
 
 export interface Response {
-  description?: string;
+  context?: OpenAIChatMessage[];
   remaining?: number;
   reset?: string;
   caption?: string;

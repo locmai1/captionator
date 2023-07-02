@@ -12,6 +12,7 @@ import LoadingDots from "../components/LoadingDots";
 import Button from "../components/Button";
 import GoogleIcon from "../components/GoogleIcon";
 import copyToClipboard from "../utils/copyToClipboard";
+import { OpenAIChatMessage } from "../types/OpenAI";
 
 // Configuration for the uploader
 const uploader = Uploader({
@@ -40,6 +41,7 @@ const Home: NextPage = () => {
   const [caption, setCaption] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [context, setContext] = useState<OpenAIChatMessage[]>([]);
   const { data, mutate, isLoading } = useSWR("/api/remaining", fetcher);
   const { status } = useSession();
 
@@ -72,6 +74,7 @@ const Home: NextPage = () => {
     if (res.status !== 200) {
       setError(response.error);
     } else {
+      setContext(response.context);
       setCaption(response.caption);
       mutate();
     }
