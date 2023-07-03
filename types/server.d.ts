@@ -1,9 +1,15 @@
 import { NextApiRequest } from "next";
 import { OpenAIChatMessage } from "./OpenAI";
 
-export interface ExtendedNextApiRequest extends NextApiRequest {
+export interface GenerateNextApiRequest extends NextApiRequest {
   body: {
     imageUrl: string;
+  };
+}
+
+export interface RefreshNextApiRequest extends NextApiRequest {
+  body: {
+    context: OpenAIChatMessage[];
   };
 }
 

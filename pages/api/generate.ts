@@ -1,25 +1,26 @@
 import type { NextApiResponse } from "next";
 import { HfInference } from "@huggingface/inference";
-import { Ratelimit } from "@upstash/ratelimit";
+// import { Ratelimit } from "@upstash/ratelimit";
 import { getServerSession } from "next-auth";
-import { Response, ExtendedNextApiRequest } from "../../types/server";
+import { Response, GenerateNextApiRequest } from "../../types/server";
 import { OpenAIChatMessage } from "../../types/OpenAI";
 import { authOptions } from "./auth/[...nextauth]";
-import redis from "../../utils/redis";
+// import redis from "../../utils/redis";
+import { ratelimit } from "../../utils/ratelimit";
 
 // Rate limiter: 5 requests per day
-const env = parseInt(process.env.UPSTASH_REDIS_RATE_LIMIT || "");
-const limit = Number.isInteger(env) ? env : 0;
-const ratelimit = redis
-  ? new Ratelimit({
-      redis: redis,
-      limiter: Ratelimit.fixedWindow(limit, "1440 m"),
-      analytics: true,
-    })
-  : undefined;
+// const env = parseInt(process.env.UPSTASH_REDIS_RATE_LIMIT || "");
+// const limit = Number.isInteger(env) ? env : 0;
+// const ratelimit = redis
+//   ? new Ratelimit({
+//       redis: redis,
+//       limiter: Ratelimit.fixedWindow(limit, "1440 m"),
+//       analytics: true,
+//     })
+//   : undefined;
 
 export default async function handler(
-  req: ExtendedNextApiRequest,
+  req: GenerateNextApiRequest,
   res: NextApiResponse<Response>
 ) {
   // Check if user is logged in
