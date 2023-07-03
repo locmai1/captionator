@@ -2,7 +2,7 @@ import type { NextApiResponse } from "next";
 import { HfInference } from "@huggingface/inference";
 import { getServerSession } from "next-auth";
 import { Response, GenerateNextApiRequest } from "../../types/server";
-import { OpenAIChatMessage } from "../../types/OpenAI";
+import { OpenAIChatMessage } from "../../types/openai";
 import { authOptions } from "./auth/[...nextauth]";
 import { ratelimit } from "../../utils/ratelimit";
 

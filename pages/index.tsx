@@ -3,7 +3,7 @@ import Image from "next/image";
 import { NextPage } from "next";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { OpenAIChatMessage } from "../types/OpenAI";
+import { OpenAIChatMessage } from "../types/openai";
 import { UploadDropzone } from "react-uploader";
 import { Uploader } from "uploader";
 import useSWR from "swr";
