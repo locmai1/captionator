@@ -1,9 +1,23 @@
 import Image from "next/image";
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
-import Button from "./Button";
+import { useSession } from "next-auth/react";
+import LogoutButton from "./LogoutButton";
+import LoadingDots from "./LoadingDots";
 
-export default function Header() {
+const Remaining = ({ generations }: { generations: number | undefined }) => {
+  return (
+    <p className="text-slate-500 mr-1 sm:text-base text-xs">
+      You have <span className="font-semibold">{generations} generations</span>{" "}
+      left today
+    </p>
+  );
+};
+
+export default function Header({
+  remaining,
+}: {
+  remaining: number | undefined;
+}) {
   const { data: session } = useSession();
 
   return (
@@ -16,12 +30,21 @@ export default function Header() {
           width={36}
           height={36}
         />
-        <h1 className="sm:text-5xl text-3xl font-bold ml-2 tracking-tight">
+        <h1 className="text-5xl hidden sm:inline-flex font-bold ml-2 tracking-tight">
           captionator
         </h1>
       </Link>
       {session && session.user && (
-        <Button text="Logout" icon={null} onClick={() => signOut()} />
+        <div className="flex flex-row items-center">
+          {!remaining && remaining != 0 ? (
+            <LoadingDots color="black" />
+          ) : remaining != 0 ? (
+            <Remaining generations={remaining} />
+          ) : (
+            <Remaining generations={0} />
+          )}
+          <LogoutButton />
+        </div>
       )}
     </header>
   );
