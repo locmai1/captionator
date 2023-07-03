@@ -249,7 +249,7 @@ const Home: NextPage = () => {
             disabled
             className="bg-black rounded-full text-white font-medium px-4 pt-2 pb-3 w-40"
           >
-            <span className="pt-4">
+            <span className="my-auto">
               <LoadingDots color="white" />
             </span>
           </button>
