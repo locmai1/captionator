@@ -2,17 +2,16 @@ import Head from "next/head";
 import Image from "next/image";
 import { NextPage } from "next";
 import { useState } from "react";
-import { useSession, signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { OpenAIChatMessage } from "../types/OpenAI";
 import { UploadDropzone } from "react-uploader";
 import { Uploader } from "uploader";
 import useSWR from "swr";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import LoadingDots from "../components/LoadingDots";
-import Button from "../components/Button";
-import GoogleIcon from "../components/GoogleIcon";
+import LoginButton from "../components/LoginButton";
 import copyToClipboard from "../utils/copyToClipboard";
-import { OpenAIChatMessage } from "../types/OpenAI";
 
 // Configuration for the uploader
 const uploader = Uploader({
@@ -42,6 +41,7 @@ const Home: NextPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [context, setContext] = useState<OpenAIChatMessage[]>([]);
+  const [guide, setGuide] = useState<boolean>(false);
   const { data, mutate, isLoading } = useSWR("/api/remaining", fetcher);
   const { status } = useSession();
 
@@ -71,6 +71,7 @@ const Home: NextPage = () => {
     });
 
     const response = await res.json();
+    console.log(response);
     if (res.status !== 200) {
       setError(response.error);
     } else {
@@ -79,7 +80,34 @@ const Home: NextPage = () => {
       mutate();
     }
     setLoading(false);
-    console.log(response);
+  }
+
+  async function refreshCaption() {
+    if (data.remaining == 0) {
+      setPhoto(null);
+      setCaption(null);
+      setError(null);
+    } else {
+      setLoading(true);
+      const res = await fetch("/api/refresh", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ context: context }),
+      });
+
+      const response = await res.json();
+      console.log(response);
+      if (res.status !== 200) {
+        setError(response.error);
+      } else {
+        setContext(response.context);
+        setCaption(response.caption);
+        mutate();
+      }
+      setLoading(false);
+    }
   }
 
   return (
@@ -89,7 +117,11 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Header />
+      {status === "authenticated" && !isLoading ? (
+        <Header remaining={data.remaining} />
+      ) : (
+        <Header remaining={undefined} />
+      )}
       <main className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 sm:mt-20 sm:mb-10 mt-10 mb-5">
         {!isLoading ? (
           <div className="flex justify-between items-center w-full flex-col">
@@ -112,56 +144,61 @@ const Home: NextPage = () => {
               </div>
             )}
             {status === "authenticated" && !photo && data.remaining != 0 ? (
-              <>
-                <p className="text-slate-500">
-                  You have{" "}
-                  <span className="font-semibold">
-                    {data.remaining} generations
-                  </span>{" "}
-                  left today.
-                </p>
-                <UploadDropZone />
-              </>
+              <UploadDropZone />
             ) : (
-              data.remaining != 0 &&
-              !photo && (
-                <Button
-                  text="Sign in with Google"
-                  icon={<GoogleIcon />}
-                  onClick={() => signIn("google")}
-                />
-              )
+              data.remaining != 0 && !photo && <LoginButton />
             )}
             {caption && photo && (
               <div className="flex flex-col h-full">
                 <div>
-                  <p className="mx-auto w-72 sm:w-96 text-xs sm:text-base text-slate-500 leading-7 sm:mb-1">
-                    Click on the{" "}
-                    <span className="relative font-bold">caption</span> below to
-                    copy it to clipboard
+                  <p className="mx-auto w-72 sm:w-96 text-xs sm:text-base leading-7 text-slate-500 sm:mb-2">
+                    Click{" "}
+                    <span
+                      className="relative font-bold underline cursor-pointer"
+                      onClick={() => refreshCaption()}
+                    >
+                      here
+                    </span>{" "}
+                    to generate a new caption below.
                   </p>
                   <button
-                    className="border border-dashed border-black rounded-lg w-72 sm:w-96 p-2 h-14 sm:h-20 mb-4"
-                    onClick={() => copyToClipboard(caption, setCaption)}
+                    className="relative group border border-dashed border-black rounded-lg w-72 sm:w-96 p-3 items-center mb-4"
+                    onMouseEnter={() => setGuide(true)}
+                    onMouseLeave={() => setGuide(false)}
+                    onClick={() => {
+                      copyToClipboard(caption, setCaption);
+                      setGuide(false);
+                    }}
                   >
-                    <h2 className="font-medium text-sm sm:text-lg">
-                      {caption}
-                    </h2>
+                    {loading ? (
+                      <LoadingDots color="black" />
+                    ) : (
+                      <>
+                        {guide && (
+                          <span className="absolute -top-1/4 w-44 left-1/2 transform -translate-x-1/2 bg-black/70 text-white p-2 text-xs transition-opacity duration-300 rounded-md">
+                            Click to copy to clipboard
+                          </span>
+                        )}
+                        <h2 className="font-medium text-sm sm:text-lg">
+                          {caption}
+                        </h2>
+                      </>
+                    )}
                   </button>
                   <Image
                     alt="photo"
                     src={photo}
-                    className="rounded-2xl max-w-[300px] sm:max-w-[500px] shadow-lg"
+                    className="mx-auto rounded-2xl max-w-[300px] sm:max-w-[500px] shadow-lg"
                     width={500}
                     height={500}
                   />
                 </div>
               </div>
             )}
-            {loading && (
+            {loading && !caption && (
               <button
                 disabled
-                className="bg-black rounded-full text-white font-medium px-4 pt-2 pb-3 hover:bg-black/80 w-40"
+                className="bg-black rounded-full text-white font-medium px-4 pt-2 pb-3 w-40"
               >
                 <span className="pt-4">
                   <LoadingDots color="white" />
@@ -210,7 +247,7 @@ const Home: NextPage = () => {
         ) : (
           <button
             disabled
-            className="bg-black rounded-full text-white font-medium px-4 pt-2 pb-3 hover:bg-black/80 w-40"
+            className="bg-black rounded-full text-white font-medium px-4 pt-2 pb-3 w-40"
           >
             <span className="pt-4">
               <LoadingDots color="white" />
