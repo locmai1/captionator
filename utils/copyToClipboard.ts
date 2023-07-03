@@ -5,6 +5,6 @@ export default function copyToClipboard(
   setCaption: Dispatch<SetStateAction<string | null>>
 ) {
   navigator.clipboard.writeText(caption);
-  setCaption("copied");
-  setTimeout(() => setCaption(caption), 2000);
+  setCaption("Copied!");
+  setTimeout(() => setCaption(caption), 1000);
 }
