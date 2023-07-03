@@ -11,11 +11,10 @@ export default async function handler(
   // Check if user is logged in
   const session = await getServerSession(req, res, authOptions);
   if (!session || !session.user) {
-    res.status(500).json({
+    return res.status(500).json({
       error: "Unauthorized request",
       type: "unauthorized_access",
     });
-    return;
   }
 
   const identifier = session.user.email;
@@ -30,10 +29,9 @@ export default async function handler(
   reset.setHours(20, 0, 0, 0);
   if (now > reset) reset.setDate(reset.getDate() + 1);
 
-  res.status(200).json({
+  return res.status(200).json({
     remaining: remaining,
     reset: reset.toLocaleString(),
     type: "success",
   });
-  return;
 }

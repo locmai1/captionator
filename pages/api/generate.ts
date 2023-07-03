@@ -13,11 +13,10 @@ export default async function handler(
   // Check if user is logged in
   const session = await getServerSession(req, res, authOptions);
   if (!session || !session.user) {
-    res.status(500).json({
+    return res.status(500).json({
       error: "Unauthenticated request",
       type: "unauthorized_access",
     });
-    return;
   }
 
   if (ratelimit) {
@@ -25,11 +24,10 @@ export default async function handler(
     const result = await ratelimit.limit(identifier!);
 
     if (!result.success) {
-      res.status(429).json({
+      return res.status(429).json({
         error: "Too many requests",
         type: "rate_limit",
       });
-      return;
     }
   }
 
@@ -44,11 +42,10 @@ export default async function handler(
   const description = descriptionResponse.generated_text;
 
   if (!description) {
-    res.status(500).json({
+    return res.status(500).json({
       error: "Failed to generate description",
       type: "unknown",
     });
-    return;
   }
 
   // Maintain context of captions
@@ -78,11 +75,10 @@ export default async function handler(
   const captionData = await captionResponse.json();
 
   if (captionData.error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: "Failed to generate caption",
       type: captionData.error.type,
     });
-    return;
   }
 
   const caption = captionData.choices[0].message.content.replace(/"/g, "");
@@ -91,11 +87,10 @@ export default async function handler(
     content: caption,
   });
 
-  res.status(200).json({
+  return res.status(200).json({
     context: context,
     caption: caption,
     usage: captionData.usage.total_tokens,
     type: "success",
   });
-  return;
 }
