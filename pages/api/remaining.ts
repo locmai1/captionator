@@ -22,7 +22,7 @@ export default async function handler(
   const timestamp = Math.floor(Date.now() / window);
   const used: number =
     (await redis?.get(`@upstash/ratelimit:${identifier!}:${timestamp}`)) || 0;
-  const remaining = 5 - used;
+  const remaining = 7 - used;
 
   const now = new Date();
   const reset = new Date();
