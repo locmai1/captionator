@@ -1,5 +1,4 @@
 import Head from "next/head";
-import Image from "next/image";
 import { NextPage } from "next";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
@@ -11,6 +10,7 @@ import Footer from "../components/Footer";
 import Header from "../components/Header";
 import LoadingDots from "../components/LoadingDots";
 import LoginButton from "../components/LoginButton";
+import UploadedPhotos from "../components/UploadedPhotos";
 import copyToClipboard from "../utils/copyToClipboard";
 
 // Configuration for the uploader
@@ -18,9 +18,10 @@ const uploader = Uploader({
   apiKey: process.env.UPLOADER_API_KEY ? process.env.UPLOADER_API_KEY : "free",
 });
 const options = {
-  maxFileCount: 1,
+  maxFileCount: 5,
   mimeTypes: ["image/jpeg", "image/png", "image/jpg"],
   editor: { images: { crop: false } },
+  multi: true,
   styles: {
     colors: {
       primary: "#000000", // Primary buttons & links
@@ -36,23 +37,22 @@ const options = {
 
 const Home: NextPage = () => {
   const fetcher = () => fetch("/api/remaining").then((res) => res.json());
-  const [photo, setPhoto] = useState<string | null>(null);
   const [caption, setCaption] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [context, setContext] = useState<OpenAIChatMessage[]>([]);
   const [guide, setGuide] = useState<boolean>(false);
+  const [fileUrls, setFileUrls] = useState<string[]>([]);
   const { data, mutate, isLoading } = useSWR("/api/remaining", fetcher);
   const { status } = useSession();
 
-  const UploadDropZone = () => (
+  const UploadDropZone: React.FC = () => (
     <UploadDropzone
       uploader={uploader}
       options={options}
-      onUpdate={async (file) => {
-        if (file.length !== 0) {
-          setPhoto(file[0].fileUrl);
-          generatePhoto(file[0].fileUrl);
+      onUpdate={async (files) => {
+        if (files.length !== 0) {
+          setFileUrls((prev) => [...prev, files[files.length - 1].fileUrl]);
         }
       }}
       width="670px"
@@ -60,14 +60,14 @@ const Home: NextPage = () => {
     />
   );
 
-  async function generatePhoto(fileUrl: string) {
+  async function generateCaption() {
     setLoading(true);
     const res = await fetch("/api/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ imageUrl: fileUrl }),
+      body: JSON.stringify({ imageUrls: fileUrls }),
     });
 
     const response = await res.json();
@@ -84,7 +84,7 @@ const Home: NextPage = () => {
 
   async function refreshCaption() {
     if (data.remaining == 0) {
-      setPhoto(null);
+      setFileUrls([]);
       setCaption(null);
       setError(null);
     } else {
@@ -132,7 +132,7 @@ const Home: NextPage = () => {
               </span>{" "}
               into captions.
             </h1>
-            {data.remaining == 0 && !photo && (
+            {data.remaining == 0 && !caption && (
               <div
                 className="mx-auto w-64 bg-red-100 border border-red-400 text-red-700 px-6 py-3 rounded relative"
                 role="alert"
@@ -143,59 +143,85 @@ const Home: NextPage = () => {
                 </span>
               </div>
             )}
-            {status === "authenticated" && !photo && data.remaining != 0 ? (
-              <UploadDropZone />
-            ) : (
-              data.remaining != 0 && !photo && <LoginButton />
-            )}
-            {caption && photo && (
-              <div className="flex flex-col h-full">
-                <div>
-                  <p className="mx-auto w-72 sm:w-96 text-xs sm:text-base leading-7 text-slate-500 sm:mb-2">
-                    Click{" "}
-                    <span
-                      className="relative font-bold underline cursor-pointer"
-                      onClick={() => refreshCaption()}
+            {status === "authenticated" && data.remaining != 0 ? (
+              fileUrls.length == 0 ? (
+                <UploadDropZone />
+              ) : (
+                !caption &&
+                !loading &&
+                !error && (
+                  <>
+                    <UploadedPhotos
+                      fileUrls={fileUrls}
+                      setFileUrls={setFileUrls}
+                      remove={true}
+                    />
+                    <button
+                      className="bg-black rounded-full text-white font-medium px-4 py-2 hover:bg-black/80 transition mt-6"
+                      onClick={() => generateCaption()}
                     >
-                      here
-                    </span>{" "}
-                    to generate a new caption below.
-                  </p>
-                  <button
-                    className="relative group border border-dashed border-black rounded-lg w-72 sm:w-96 p-3 items-center mb-4"
-                    onMouseEnter={() => setGuide(true)}
-                    onMouseLeave={() => setGuide(false)}
-                    onClick={() => {
-                      copyToClipboard(caption, setCaption);
-                      setGuide(false);
-                    }}
+                      Generate Caption
+                    </button>
+                  </>
+                )
+              )
+            ) : (
+              data.remaining != 0 && <LoginButton />
+            )}
+            {caption && (
+              <div className="flex flex-col h-full">
+                <p className="mx-auto w-72 sm:w-96 text-xs sm:text-base leading-7 text-slate-500 sm:mb-2">
+                  Click{" "}
+                  <span
+                    className="relative font-bold underline cursor-pointer"
+                    onClick={() => refreshCaption()}
                   >
-                    {loading ? (
-                      <LoadingDots color="black" />
-                    ) : (
-                      <>
-                        {guide && (
-                          <span className="absolute -top-1/4 w-44 left-1/2 transform -translate-x-1/2 bg-black/70 text-white p-2 text-xs transition-opacity duration-300 rounded-md">
-                            Click to copy to clipboard
-                          </span>
-                        )}
-                        <h2 className="font-medium text-sm sm:text-lg">
-                          {caption}
-                        </h2>
-                      </>
-                    )}
+                    here
+                  </span>{" "}
+                  to generate a new caption below.
+                </p>
+                <button
+                  className="relative group border border-dashed border-black rounded-lg w-72 sm:w-96 p-3 items-center mb-4 mx-auto"
+                  onMouseEnter={() => setGuide(true)}
+                  onMouseLeave={() => setGuide(false)}
+                  onClick={() => {
+                    !loading && copyToClipboard(caption, setCaption);
+                    !loading && setGuide(false);
+                  }}
+                >
+                  {guide && !loading && (
+                    <span className="absolute -top-4 w-44 transform -translate-x-1/2 bg-black/70 text-white p-2 text-xs transition-opacity duration-300 rounded-md">
+                      Click to copy to clipboard
+                    </span>
+                  )}
+                  {loading ? (
+                    <LoadingDots color="black" />
+                  ) : (
+                    <h2 className="font-medium text-sm sm:text-lg">
+                      {caption}
+                    </h2>
+                  )}
+                </button>
+                <UploadedPhotos
+                  fileUrls={fileUrls}
+                  setFileUrls={setFileUrls}
+                  remove={false}
+                />
+                <div className="flex space-x-2 justify-center">
+                  <button
+                    onClick={() => {
+                      setFileUrls([]);
+                      setCaption(null);
+                      setError(null);
+                    }}
+                    className="bg-black rounded-full text-white font-medium px-4 py-2 hover:bg-black/80 transition mt-6"
+                  >
+                    Upload New Photos
                   </button>
-                  <Image
-                    alt="photo"
-                    src={photo}
-                    className="mx-auto rounded-2xl max-w-[300px] sm:max-w-[500px] shadow-lg"
-                    width={500}
-                    height={500}
-                  />
                 </div>
               </div>
             )}
-            {loading && !caption && (
+            {loading && (
               <button
                 disabled
                 className="bg-black rounded-full text-white font-medium px-4 pt-2 pb-3 w-40"
@@ -205,20 +231,6 @@ const Home: NextPage = () => {
                 </span>
               </button>
             )}
-            <div className="flex space-x-2 justify-center">
-              {photo && !loading && !error && (
-                <button
-                  onClick={() => {
-                    setPhoto(null);
-                    setCaption(null);
-                    setError(null);
-                  }}
-                  className="bg-black rounded-full text-white font-medium px-4 py-2 hover:bg-black/80 transition mt-6"
-                >
-                  Upload New Photo
-                </button>
-              )}
-            </div>
             {error && (
               <div>
                 <div
@@ -232,7 +244,7 @@ const Home: NextPage = () => {
                   <button
                     className="relative font-bold underline"
                     onClick={() => {
-                      setPhoto(null);
+                      setFileUrls([]);
                       setCaption(null);
                       setError(null);
                     }}
