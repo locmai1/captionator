@@ -52,7 +52,8 @@ const Home: NextPage = () => {
       options={options}
       onUpdate={async (files) => {
         if (files.length !== 0) {
-          setFileUrls((prev) => [...prev, files[files.length - 1].fileUrl]);
+          const urls = files.map((file) => file.fileUrl);
+          setFileUrls(urls);
         }
       }}
       width="670px"
