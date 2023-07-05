@@ -24,13 +24,13 @@ const options = {
   multi: true,
   styles: {
     colors: {
-      primary: "#000000", // Primary buttons & links
-      active: "#000000cc", // Primary buttons & links (hover). Inferred if undefined.
-      shade400: "#999999", // Welcome text
-      shade600: "#999999", // Border
-      shade700: "#ffffff", // Progress indicator background
-      shade800: "#fafafa", // File item background
-      shade900: "#ffffff", // Various (draggable crop buttons, etc.)
+      primary: "#000000",
+      active: "#000000cc",
+      shade400: "#999999",
+      shade600: "#999999",
+      shade700: "#ffffff",
+      shade800: "#fafafa",
+      shade900: "#ffffff",
     },
   },
 };
