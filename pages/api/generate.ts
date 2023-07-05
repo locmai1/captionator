@@ -31,31 +31,37 @@ export default async function handler(
     }
   }
 
-  const imageUrl = await fetch(req.body.imageUrl);
-  const blob = await imageUrl.blob();
-
+  const descriptions = [];
+  const imageUrls = req.body.imageUrls;
   const inference = new HfInference(process.env.HF_ACCESS_TOKEN);
-  const descriptionResponse = await inference.imageToText({
-    data: blob,
-    model: "Salesforce/blip-image-captioning-large",
-  });
-  const description = descriptionResponse.generated_text;
+  console.log("generating descriptions...");
+  for (const imageUrl of imageUrls) {
+    const image = await fetch(imageUrl);
+    const blob = await image.blob();
+    const descriptionResponse = await inference.imageToText({
+      data: blob,
+      model: "Salesforce/blip-image-captioning-large",
+    });
+    descriptions.push(descriptionResponse.generated_text);
+  }
 
-  if (!description) {
+  if (!descriptions) {
     return res.status(500).json({
       error: "Failed to generate description",
       type: "unknown",
     });
   }
+  console.log("descriptions generated:", descriptions);
 
   // Maintain context of captions
   const context: OpenAIChatMessage[] = [
     {
       role: "user",
-      content: `short ig caption: ${description}`,
+      content: `1 short ig caption: ${descriptions}`,
     },
   ];
 
+  console.log("generating caption...");
   const captionResponse = await fetch(
     "https://api.openai.com/v1/chat/completions",
     {
@@ -68,7 +74,7 @@ export default async function handler(
         model: "gpt-3.5-turbo",
         messages: context,
         temperature: 0.7,
-        max_tokens: 30,
+        max_tokens: 100,
       }),
     }
   );
@@ -86,6 +92,7 @@ export default async function handler(
     role: "assistant",
     content: caption,
   });
+  console.log("caption generated:", caption);
 
   return res.status(200).json({
     context: context,

@@ -3,7 +3,7 @@ import { OpenAIChatMessage } from "./openai";
 
 export interface GenerateNextApiRequest extends NextApiRequest {
   body: {
-    imageUrl: string;
+    imageUrls: string[];
   };
 }
 
