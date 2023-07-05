@@ -4,6 +4,7 @@ import Image from "next/image";
 type UploadedPhotosProps = {
   fileUrls: string[];
   setFileUrls: Dispatch<SetStateAction<string[]>>;
+  remove: boolean;
 };
 
 const DeleteIcon = () => {
@@ -52,6 +53,7 @@ const DeleteIcon = () => {
 const UploadedPhotos: React.FC<UploadedPhotosProps> = ({
   fileUrls,
   setFileUrls,
+  remove,
 }) => {
   const handleRemove = (index: number) => {
     const updatedUrls = [...fileUrls];
@@ -70,12 +72,14 @@ const UploadedPhotos: React.FC<UploadedPhotosProps> = ({
             width={500}
             height={500}
           />
-          <button
-            className="absolute top-1 right-1 text-black/80 rounded-full p-2"
-            onClick={() => handleRemove(i)}
-          >
-            <DeleteIcon />
-          </button>
+          {remove && (
+            <button
+              className="absolute top-1 right-1 text-black/80 rounded-full p-2"
+              onClick={() => handleRemove(i)}
+            >
+              <DeleteIcon />
+            </button>
+          )}
         </div>
       ))}
     </div>
