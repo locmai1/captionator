@@ -150,7 +150,7 @@ const Home: NextPage = () => {
                 !caption &&
                 !loading &&
                 !error && (
-                  <>
+                  <div>
                     <UploadedPhotos
                       fileUrls={fileUrls}
                       setFileUrls={setFileUrls}
@@ -162,7 +162,7 @@ const Home: NextPage = () => {
                     >
                       Generate Caption
                     </button>
-                  </>
+                  </div>
                 )
               )
             ) : (
