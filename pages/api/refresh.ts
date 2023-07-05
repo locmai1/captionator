@@ -35,6 +35,7 @@ export default async function handler(
     content: "a different one",
   });
 
+  console.log("generating another caption...");
   const captionResponse = await fetch(
     "https://api.openai.com/v1/chat/completions",
     {
@@ -65,6 +66,7 @@ export default async function handler(
     role: "assistant",
     content: caption,
   });
+  console.log("caption generated:", caption);
 
   return res.status(200).json({
     context: context,
