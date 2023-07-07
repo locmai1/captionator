@@ -208,24 +208,26 @@ const Home: NextPage = () => {
                   setFileUrls={setFileUrls}
                   remove={false}
                 />
-                <div className="flex space-x-2 justify-center">
-                  <button
-                    onClick={() => {
-                      setFileUrls([]);
-                      setCaption(null);
-                      setError(null);
-                    }}
-                    className="bg-black rounded-full text-white font-medium px-4 py-2 hover:bg-black/80 transition mt-6"
-                  >
-                    Upload New Photos
-                  </button>
-                </div>
+                {!loading && (
+                  <div className="flex space-x-2 justify-center">
+                    <button
+                      onClick={() => {
+                        setFileUrls([]);
+                        setCaption(null);
+                        setError(null);
+                      }}
+                      className="bg-black rounded-full text-white font-medium px-4 py-2 hover:bg-black/80 transition mt-6"
+                    >
+                      Upload New Photos
+                    </button>
+                  </div>
+                )}
               </div>
             )}
             {loading && (
               <button
                 disabled
-                className="bg-black rounded-full text-white font-medium px-4 pt-2 pb-3 w-40"
+                className="bg-black rounded-full text-white font-medium px-4 pt-2 pb-3 w-40 mt-6"
               >
                 <span className="pt-4">
                   <LoadingDots color="white" />
