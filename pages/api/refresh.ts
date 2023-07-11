@@ -1,6 +1,6 @@
 import type { NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
-import { Response, RefreshNextApiRequest } from "../../types/server";
+import { Response, RefreshNextApiRequest } from "../../utils/types";
 import { authOptions } from "./auth/[...nextauth]";
 import { ratelimit } from "../../utils/ratelimit";
 

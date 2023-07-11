@@ -1,38 +1,14 @@
 import { NextPage } from "next";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { OpenAIChatMessage } from "../types/openai";
 import { UploadDropzone } from "react-uploader";
-import { Uploader } from "uploader";
-import useSWR from "swr";
+import { OpenAIChatMessage } from "../utils/types";
+import { uploader, options } from "../utils/uploader";
+import copyToClipboard from "../utils/copy";
 import LoadingDots from "../components/LoadingDots";
 import LoginButton from "../components/LoginButton";
 import UploadedPhotos from "../components/UploadedPhotos";
-import copyToClipboard from "../utils/copyToClipboard";
-
-// Configuration for the uploader
-const uploader = Uploader({
-  apiKey: process.env.NEXT_PUBLIC_UPLOADER_API_KEY
-    ? process.env.NEXT_PUBLIC_UPLOADER_API_KEY
-    : "free",
-});
-const options = {
-  maxFileCount: 5,
-  mimeTypes: ["image/jpeg", "image/png", "image/jpg"],
-  editor: { images: { crop: false } },
-  multi: true,
-  styles: {
-    colors: {
-      primary: "#000000",
-      active: "#000000cc",
-      shade400: "#999999",
-      shade600: "#999999",
-      shade700: "#ffffff",
-      shade800: "#ffffff",
-      shade900: "#ffffff",
-    },
-  },
-};
+import useSWR from "swr";
 
 const Home: NextPage = () => {
   const fetcher = () => fetch("/api/remaining").then((res) => res.json());

@@ -1,10 +1,13 @@
 import type { NextApiResponse } from "next";
 import { HfInference } from "@huggingface/inference";
 import { getServerSession } from "next-auth";
-import { Response, GenerateNextApiRequest } from "../../types/server";
-import { OpenAIChatMessage } from "../../types/openai";
 import { authOptions } from "./auth/[...nextauth]";
 import { ratelimit } from "../../utils/ratelimit";
+import {
+  Response,
+  GenerateNextApiRequest,
+  OpenAIChatMessage,
+} from "../../utils/types";
 
 export default async function handler(
   req: GenerateNextApiRequest,

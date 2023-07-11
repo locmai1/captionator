@@ -1,5 +1,10 @@
 import { NextApiRequest } from "next";
-import { OpenAIChatMessage } from "./openai";
+
+export interface OpenAIChatMessage {
+  id?: number;
+  role: "system" | "assistant" | "user";
+  content: string;
+}
 
 export interface GenerateNextApiRequest extends NextApiRequest {
   body: {

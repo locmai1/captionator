@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
-import { Response } from "../../types/server";
+import { Response } from "../../utils/types";
 import { authOptions } from "./auth/[...nextauth]";
 import redis from "../../utils/redis";
 
