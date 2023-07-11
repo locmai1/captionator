@@ -12,7 +12,9 @@ import copyToClipboard from "../utils/copyToClipboard";
 
 // Configuration for the uploader
 const uploader = Uploader({
-  apiKey: process.env.UPLOADER_API_KEY ? process.env.UPLOADER_API_KEY : "free",
+  apiKey: process.env.NEXT_PUBLIC_UPLOADER_API_KEY
+    ? process.env.NEXT_PUBLIC_UPLOADER_API_KEY
+    : "free",
 });
 const options = {
   maxFileCount: 5,
