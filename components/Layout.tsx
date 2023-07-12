@@ -4,6 +4,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 import Modal from "./Modal";
 import LoadingDots from "./LoadingDots";
+import FeedbackForm from "./FeedbackForm";
 import useSWR from "swr";
 import { useSession } from "next-auth/react";
 
@@ -27,7 +28,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       )}
 
       <Modal isVisible={showModal} onClose={() => setShowModal(false)}>
-        <div className="h-60 w-80 sm:w-96"></div>
+        <FeedbackForm />
       </Modal>
 
       <div className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 sm:mt-20 sm:mb-10 mt-10 mb-5 max-w-6xl">
