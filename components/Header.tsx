@@ -21,7 +21,7 @@ export default function Header({
   const { data: session } = useSession();
 
   return (
-    <header className="flex justify-between items-center h-16 w-full mt-5 border-b border-black/20 pb-7 sm:px-4 px-2">
+    <header className="flex justify-between items-center h-16 w-full mt-5 border-b border-black/20 pb-7 sm:px-4 px-2 max-w-6xl">
       <Link href="/" className="flex space-x-2">
         <Image
           alt="header text"

@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import Head from "next/head";
 import Header from "./Header";
 import Footer from "./Footer";
+import Modal from "./Modal";
 import LoadingDots from "./LoadingDots";
 import useSWR from "swr";
 import { useSession } from "next-auth/react";
@@ -10,9 +11,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const fetcher = () => fetch("/api/remaining").then((res) => res.json());
   const { data, isLoading } = useSWR("/api/remaining", fetcher);
   const { status } = useSession();
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   return (
-    <div className="flex max-w-6xl mx-auto flex-col items-center justify-center py-2 min-h-screen">
+    <div className="flex min-w-screen mx-auto flex-col items-center justify-center py-2 min-h-screen">
       <Head>
         <title>captionator</title>
         <link rel="icon" href="/images/favicon.ico" />
@@ -24,7 +26,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <Header remaining={undefined} />
       )}
 
-      <div className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 sm:mt-20 sm:mb-10 mt-10 mb-5">
+      <Modal isVisible={showModal} onClose={() => setShowModal(false)}>
+        <div className="h-60 w-80 sm:w-96"></div>
+      </Modal>
+
+      <div className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 sm:mt-20 sm:mb-10 mt-10 mb-5 max-w-6xl">
         {!isLoading ? (
           children
         ) : (
@@ -39,7 +45,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         )}
       </div>
 
-      <Footer />
+      <Footer setShowModal={setShowModal} />
     </div>
   );
 }

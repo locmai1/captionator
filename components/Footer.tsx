@@ -1,6 +1,12 @@
-export default function Footer() {
+import { Dispatch, SetStateAction } from "react";
+
+export default function Footer({
+  setShowModal,
+}: {
+  setShowModal: Dispatch<SetStateAction<boolean>>;
+}) {
   return (
-    <footer className="text-center h-16 sm:h-20 w-full sm:pt-2 pt-4 border-t border-black/20 flex sm:flex-row flex-col justify-between items-center px-3 space-y-2 sm:mb-0 mb-3">
+    <footer className="text-center h-16 sm:h-20 w-full sm:pt-2 pt-4 border-t border-black/20 flex sm:flex-row flex-col justify-between items-center px-3 sm:mb-0 mb-3 max-w-6xl">
       <div>
         Powered by{" "}
         <a
@@ -31,6 +37,12 @@ export default function Footer() {
         </a>
         .
       </div>
+      <button
+        className="text-center mt-2 sm:mt-0 underline"
+        onClick={() => setShowModal(true)}
+      >
+        Submit Feedback
+      </button>
     </footer>
   );
 }
