@@ -38,7 +38,7 @@ export default function Footer({
         .
       </div>
       <button
-        className="mt-2 sm:mt-0 font-medium text-sm flex items-center rounded-full bg-black text-white px-4 py-1 hover:bg-black/80 transition"
+        className="mt-2 sm:mt-0 px-3 py-0 sm:py-1 inline-flex justify-center items-center rounded-md border-2 border-black font-semibold text-black hover:text-white hover:bg-black hover:border-black focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-all text-md"
         onClick={() => setShowModal(true)}
       >
         Contact
